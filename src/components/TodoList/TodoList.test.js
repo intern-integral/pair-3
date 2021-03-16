@@ -27,7 +27,7 @@ describe('TodoList', () => {
     });
   });
 
-  describe('#onClick', () => {
+  describe('#handleAdd', () => {
     it('should delete todo item when delete button clicked', () => {
       const mockHandleDelete = jest.fn();
       const wrapper = shallow(<TodoList handleDelete={mockHandleDelete} todos={data} />);

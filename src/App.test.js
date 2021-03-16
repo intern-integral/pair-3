@@ -12,7 +12,15 @@ describe('App', () => {
       expect(todoTitle.text()).toBe('Todo List');
     });
 
-    it('should display todo list', () => {
+    it('should render todo form properly', () => {
+      const wrapper = shallow(<App />);
+
+      const todoForm = wrapper.find('TodoForm');
+
+      expect(todoForm).toHaveLength(1);
+    });
+
+    it('should render todo list', () => {
       const wrapper = shallow(<App />);
 
       const todoList = wrapper.find('.todo-list');
@@ -44,6 +52,18 @@ describe('App', () => {
 
       expect(expectedTodos.length).toBe(2);
       expect(expectedTodos).toEqual(expectedData);
+    });
+  });
+
+  describe('#handleAdd', () => {
+    it('should add new todo when invoked', async () => {
+      const wrapper = shallow(<App />);
+
+      const todoFormComponent = wrapper.find('TodoForm');
+      await todoFormComponent.props().handleAdd('banana', 'tayo the little bus');
+      const todoListComponent = wrapper.find('TodoList');
+
+      expect(todoListComponent.props().todos.length).toBe(4);
     });
   });
 });
