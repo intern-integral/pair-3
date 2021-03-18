@@ -1,9 +1,21 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 
 
-const TodoForm = ({ handleAdd }) => {
+const TodoForm = ({ handleAdd, handleUpdate, todoData }) => {
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
+
+  useEffect(() => {
+    if (todoData) {
+      setTitle(todoData[0].title);
+      setDescription(todoData[0].description);
+    }
+  }, [todoData]);
+
+  const createOrEdit = () => {
+    if (!todoData) return handleAdd(title, description);
+    return handleUpdate(todoData[0]._id, title, description);
+  };
 
   return (
     <div>
@@ -25,7 +37,7 @@ const TodoForm = ({ handleAdd }) => {
       />
       <br />
       <button
-        onClick={() => handleAdd(title, description)}
+        onClick={createOrEdit}
         className="add-btn"
         type="button"
       >
