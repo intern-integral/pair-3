@@ -1,14 +1,24 @@
 import axios from 'axios';
 import TodoServices from './TodoServices';
 
-const { fetchAll } = TodoServices;
+const {
+  add, fetchAll, fetchById, update
+} = TodoServices;
+const URI = 'http://127.0.0.1:3333/api/todos/';
+
 jest.mock('axios', () => ({
-  get: jest.fn()
+  get: jest.fn(),
+  post: jest.fn(),
+  patch: jest.fn()
 }));
 
 describe('TodoServices', () => {
+  afterEach(() => {
+    jest.clearAllMocks();
+  });
+
   describe('#fetchAll', () => {
-    it('should fetch all data when called', async () => {
+    it('should fetch all data when fetchAll function called using mock', async () => {
       const expectedValue = {
         data: {
           data: [
@@ -23,9 +33,10 @@ describe('TodoServices', () => {
       const fetchedData = await fetchAll();
 
       expect(fetchedData).toEqual(expectedValue.data.data);
+      expect(axios.get).toHaveBeenCalled();
     });
 
-    it('should fetch all data when called using mock', async () => {
+    it('should fetch all data when fetchAll function called using mock', async () => {
       const expectedValue = {
         data: {
           data: [
@@ -40,6 +51,66 @@ describe('TodoServices', () => {
       const fetchedData = await fetchAll();
 
       expect(fetchedData).toEqual(expectedValue.data.data);
+      expect(axios.get).toHaveBeenCalled();
+    });
+  });
+
+  describe('#add', () => {
+    it('should call axios POST with correct params when add function invoked', async () => {
+      const expectedValue = {
+        data: [
+          { _id: '6051c7bd06526d5760007b81', title: 'new todo', description: 'added from test' }
+        ]
+      };
+      const newTodo = {
+        title: 'new todo',
+        description: 'added from test'
+      };
+      axios.post.mockReturnValue(expectedValue);
+
+      const returnedTodo = await add(newTodo);
+
+      expect(axios.post).toHaveBeenCalledWith(URI, newTodo);
+      expect(returnedTodo).toEqual(expectedValue.data);
+    });
+  });
+
+  describe('#update', () => {
+    it('should call axios PATCH with correct params when update function invoked', async () => {
+      const ID = '6051c7bd06526d5760007b81';
+      const URIwithID = `${URI}${ID}`;
+      const updatedTodo = {
+        title: 'updated todo',
+        description: 'this todo has been updated'
+      };
+      const expectedValue = {
+        data: [
+          { _id: ID, title: updatedTodo.title, description: updatedTodo.description }
+        ]
+      };
+      axios.patch.mockReturnValue(expectedValue);
+
+      const returnedTodo = await update(ID, updatedTodo);
+
+      expect(axios.patch).toHaveBeenCalledWith(URIwithID, updatedTodo);
+      expect(returnedTodo).toEqual(expectedValue.data);
+    });
+  });
+
+  describe('#edit', () => {
+    it('should call axios GET with correct params when update function invoked', async () => {
+      const expectedValue = {
+        data: [
+          { _id: '6051c7bd06526d5760007b81', title: 'selected todo', description: 'this todo is selected' }
+        ]
+      };
+      axios.get.mockReturnValue(expectedValue);
+      const URIwithID = `${URI}6051c7bd06526d5760007b81`;
+
+      const returnedTodo = await fetchById('6051c7bd06526d5760007b81');
+
+      expect(axios.get).toHaveBeenCalledWith(URIwithID);
+      expect(returnedTodo).toEqual(expectedValue.data);
     });
   });
 });
