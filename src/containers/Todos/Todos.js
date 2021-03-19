@@ -55,9 +55,7 @@ const Todos = () => {
   };
 
   const handleEdit = async (id) => {
-    // const findTodo = todos.filter((todo) => todo._id === id);
-    // bingung hiks
-    const findTodo = await fetchById(id);
+    const findTodo = todos.filter((todo) => todo._id === id);
 
     setSelectedTodo(findTodo);
   };

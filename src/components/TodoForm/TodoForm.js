@@ -1,11 +1,12 @@
 import React, { useEffect, useState } from 'react';
+import { isEmpty } from 'lodash';
 
 const TodoForm = ({ handleAdd, handleUpdate, todoData }) => {
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
 
   useEffect(() => {
-    if (todoData) {
+    if (!isEmpty(todoData)) {
       setTitle(todoData[0].title);
       setDescription(todoData[0].description);
     }

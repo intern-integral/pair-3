@@ -7,7 +7,6 @@ import TodoServices from '../../services/TodoServices';
 const {
   add,
   fetchAll,
-  fetchById,
   update
 } = TodoServices;
 
@@ -15,10 +14,16 @@ jest.mock('../../services/TodoServices', () => ({
   fetchAll: jest.fn(),
   add: jest.fn(),
   update: jest.fn(),
-  fetchById: jest.fn(),
+  fetchById: jest.fn()
 }));
 
 describe('Todos', () => {
+  const mockFetchedData = [
+    { _id: '6051c7bd06526d5760007b81', title: 'Hello World', description: 'Duaaar ini todo list pertama hore' },
+    { _id: '6051c7ae06526d5760007b80', title: 'banana potato', description: 'lorem ipsum dolor sit amet' },
+    { _id: '6051c79d06526d5760007b7f', title: 'hehe iseng', description: 'mbeeeee' }
+  ];
+
   describe('#render', () => {
     it('should render todos title', () => {
       const wrapper = shallow(<Todos />);
@@ -45,12 +50,7 @@ describe('Todos', () => {
     });
 
     it('should fetch todo list from API and pass data as props to TodoList component', async () => {
-      const expectedData = [
-        { _id: '6051c7bd06526d5760007b81', title: 'Hello World', description: 'Duaaar ini todo list pertama hore' },
-        { _id: '6051c7ae06526d5760007b80', title: 'banana potato', description: 'lorem ipsum dolor sit amet' },
-        { _id: '6051c79d06526d5760007b7f', title: 'hehe iseng', description: 'mbeeeee' }
-      ];
-      fetchAll.mockResolvedValue(expectedData);
+      fetchAll.mockResolvedValue(mockFetchedData);
       let wrapper;
       await act(async () => {
         wrapper = await mount(<Todos />);
@@ -59,14 +59,14 @@ describe('Todos', () => {
 
       const todoListComponent = wrapper.find('TodoList');
 
-      expect(todoListComponent.props().todos).toEqual(expectedData);
+      expect(todoListComponent.props().todos).toEqual(mockFetchedData);
       expect(fetchAll).toHaveBeenCalledTimes(1);
     });
   });
 
-  describe('#handleDelete', () => {
+  xdescribe('#handleDelete', () => {
     it('should delete todo when invoked', async () => {
-      const expectedData = [
+      const expectedDeletedData = [
         { _id: '6051c7ae06526d5760007b80', title: 'banana potato', description: 'lorem ipsum dolor sit amet' },
         { _id: '6051c79d06526d5760007b7f', title: 'hehe iseng', description: 'mbeeeee' }
       ];
@@ -78,7 +78,7 @@ describe('Todos', () => {
       const expectedTodos = todoListComponentUpdated.props().todos;
 
       expect(expectedTodos.length).toBe(2);
-      expect(expectedTodos).toEqual(expectedData);
+      expect(expectedTodos).toEqual(expectedDeletedData);
     });
   });
 
@@ -115,35 +115,23 @@ describe('Todos', () => {
 
   describe('#handleEdit', () => {
     it('should invoke handleEdit when called', async () => {
-      // pake method satunya bingung gimana caranya :(
-      const ID = '6051c7bd06526d5760007b81';
-      const wrapper = shallow(<Todos />);
+      fetchAll.mockResolvedValue(mockFetchedData);
+      const expectedEditData = [{ _id: '6051c79d06526d5760007b7f', title: 'hehe iseng', description: 'mbeeeee' }];
+      let wrapper;
+      await act(async () => {
+        wrapper = await mount(<Todos />);
+        await (new Promise((resolve) => setTimeout(resolve, 0)));
+        wrapper.update();
+      });
 
-      const todoListComponent = wrapper.find('TodoList');
-      todoListComponent.props().handleEdit(ID);
+      await act(async () => {
+        const todoListComponent = wrapper.find('TodoList');
+        await todoListComponent.props().handleEdit('6051c79d06526d5760007b7f');
+        wrapper.update();
+      });
+      const updatedTodoFormComponent = wrapper.find('TodoForm');
 
-      expect(fetchById).toHaveBeenCalledWith(ID);
+      expect(updatedTodoFormComponent.props().todoData).toEqual(expectedEditData);
     });
-
-    // it('should invoke handleEdit when called', async () => {
-    //   const resolvedData = [
-    //     { _id: '6051c7bd06526d5760007b81', title: 'Hello World', description: 'Duaaar ini todo list pertama hore' },
-    //     { _id: '6051c7ae06526d5760007b80', title: 'banana potato', description: 'lorem ipsum dolor sit amet' },
-    //     { _id: '6051c79d06526d5760007b7f', title: 'hehe iseng', description: 'mbeeeee' }
-    //   ];
-    //   fetchAll.mockResolvedValue(resolvedData);
-    //   const expectedData = [{ _id: '6051c79d06526d5760007b7f', title: 'hehe iseng', description: 'mbeeeee' }];
-    //   let wrapper;
-    //   // const wrapper = mount(<Todos />);
-    //   await act(async () => {
-    //     wrapper = await mount(<Todos />);
-    //     const todoListComponent = wrapper.find('TodoList');
-    //     await todoListComponent.props().handleEdit('6051c79d06526d5760007b7f');
-    //   });
-    //   wrapper.update();
-    //   const updatedTodoFormComponent = wrapper.find('TodoForm');
-
-    //   expect(updatedTodoFormComponent.props().todoData).toEqual(expectedData);
-    // });
   });
 });
