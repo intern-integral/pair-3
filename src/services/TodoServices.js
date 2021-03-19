@@ -22,6 +22,11 @@ class TodoServices {
     const response = await axios.patch(URI + id, todo);
     return response.data;
   }
+
+  static remove = async (id) => {
+    const response = await axios.delete(URI + id);
+    return response.data;
+  }
 }
 
 export default TodoServices;

@@ -2,14 +2,15 @@ import axios from 'axios';
 import TodoServices from './TodoServices';
 
 const {
-  add, fetchAll, fetchById, update
+  add, fetchAll, fetchById, remove, update
 } = TodoServices;
 const URI = 'http://127.0.0.1:3333/api/todos/';
 
 jest.mock('axios', () => ({
   get: jest.fn(),
   post: jest.fn(),
-  patch: jest.fn()
+  patch: jest.fn(),
+  delete: jest.fn()
 }));
 
 describe('TodoServices', () => {
@@ -110,6 +111,23 @@ describe('TodoServices', () => {
       const returnedTodo = await fetchById('6051c7bd06526d5760007b81');
 
       expect(axios.get).toHaveBeenCalledWith(URIwithID);
+      expect(returnedTodo).toEqual(expectedValue.data);
+    });
+  });
+
+  describe('#remove', () => {
+    it('should call axios DELETE with correct params when delete function invoked', async () => {
+      const expectedValue = {
+        data: [
+          { _id: '6051c7bd06526d5760007b81', title: 'deleted todo', description: 'this todo is deleted' }
+        ]
+      };
+      axios.delete.mockReturnValue(expectedValue);
+      const URIwithID = `${URI}6051c7bd06526d5760007b81`;
+
+      const returnedTodo = await remove('6051c7bd06526d5760007b81');
+
+      expect(axios.delete).toHaveBeenCalledWith(URIwithID);
       expect(returnedTodo).toEqual(expectedValue.data);
     });
   });

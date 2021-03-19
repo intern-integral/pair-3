@@ -7,7 +7,7 @@ const Todos = () => {
   const {
     add,
     fetchAll,
-    fetchById,
+    remove,
     update
   } = TodoServices;
 
@@ -34,8 +34,10 @@ const Todos = () => {
     setTodos([todoWithId, ...todos]);
   };
 
-  const handleDelete = (id) => {
+  const handleDelete = async (id) => {
     const updatedTodos = todos.filter((todo) => todo.id !== id);
+
+    await remove(id);
 
     setTodos(updatedTodos);
   };
